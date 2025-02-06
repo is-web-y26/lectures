@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Лекция 1. Вводная лекция</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reset.min.css" integrity="sha512-Mjxkx+r7O/OLQeKeIBCQ2yspG1P5muhAtv/J+p2/aPnSenciZWm5Wlnt+NOUNA4SHbnBIE/R2ic0ZBiCXdQNUg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css" integrity="sha512-0AUO8B5ll9y1ERV/55xq3HeccBGnvAJQsVGitNac/iQCLyDTGLUBMPqlupIWp/rJg0hV3WWHusXchEIdqFAv1Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/white.min.css" integrity="sha512-NJYOiL4HPnu7QvvGcvHAnVVz2X6qWcTDAH4x3fmUOW/SGUbK46IbzHhQ1KoKDfK2trs5RwUu03Ax9sxjqz1iQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/white.min.css" integrity="sha512-NJYOiL4HPnu7QvvGcvHAnVVz2X6qWcTDAH4x3fmUOW/SGUbK46IbzHhQ1KoKDfK2trs5RwUu03Ax9sxjqz1iQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --r-heading-font: "Source Sans 3", sans-serif;
+            --r-main-font: "Source Sans 3", sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section data-markdown>
+                <textarea data-template>
+                    # Вводная лекция
+                      
+                    Web server vs Application server
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Основные понятия
+
+                    Основной структурной единицей сети является web-сайт (или просто сайт).
+
+                    **Web-сайт** – это обобщенный термин, обозначающий объединенный под одним адресом (доменным именем или IP-адресом) набор логически связанных ресурсов.
+
+                    Ресурсы можно разделить на два типа: статические и динамические.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Статические ресурсы
+
+                    **Статические ресурсы** - любые файлы данных, к которым есть доступ из сети интернет:
+                    
+                    * HTML-документы;
+                    * JS-скрипты;
+                    * CSS-стили;
+                    * Изображения и остальное медиа.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Динамические ресурсы
+
+                    **Динамические ресурсы** - программные объекты, к которым можно обратиться и по запросу получить некоторый ресурс:
+                    
+                    * Web-приложения;
+                    * Шаблоны веб-страниц;
+                    * Программные модули (`.exe`, `.dll`);
+                    * Скрипты (`.php`, `.pl`).
+
+                    Динамические ресурсы просто так работать не будут...
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Web-сервер
+
+                    **Web-сервер** (или HTTP-сервер) – это серверная программа, работающая в фоновом режиме, ожидающая запросы пользователей и выполняющая их обработку. 
+                    Web-сервер принимает HTTP-запросы от клиентов (обычно web-браузеров) и возвращает им HTTP-ответы (обычно вместе с web-страницами (HTML-документами)). 
+                    Web-серверы составляют основу web-сети.
+
+                    Web-серверы и браузеры обмениваются между собой НТТР-сообщениями. 
+                    Серверы получают и обрабатывают HTTP-запросы, определяют местоположение запрашиваемых ресурсов и выполняют к ним доступ, формируют ответы, 
+                    которые они отправляют назад браузерам, сделавшим эти запросы. <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown data-visibility="hidden" style="text-align: left">
+                <textarea data-template>
+                    ## Web-сервер
+
+                    ```mermaid 
+                    sequenceDiagram
+                        Alice->>+John: Hello John, how are you?
+                        Alice->>+John: John, can you hear me?
+                        John-->>-Alice: Hi Alice, I can hear you!
+                        John-->>-Alice: I feel great!
+                    ```
+                    <!-- .element: style="background-color: var(--r-background-color)" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left"  data-background-image="images/durgasoft.png">
+                <textarea data-template>
+                    ## Web-сервер и сервер приложения <!-- .element: style="color: white" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Web-сервер и сервер приложения
+
+                    В теории можно отдельно выделить web-сервер и сервер приложения. В чём между ними разница:
+
+                    * Web-сервер отвечает в основном за обработку HTTP-запросов и работу со статическими ресурсами;
+                    * Сервер приложения отвечает не только за статические, но и за динамические ресурсы, поскольку выполняет бизнес-логику.
+
+                    То есть сервер приложения обычно включает в себя web-сервер.
+
+                    Иногда говорят про статический web-сервер и динамический web-сервер, 
+                    тут лучше видно, в чём отличие, но речь об одном и том же. <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Примеры web-серверов
+
+                    Всегда можно написать свой web-сервер с нуля, стандартные библиотеки это позволяют, но есть и другие варианты:
+
+                    * Отдельный web-сервер, подбираемый под текущий стек технологий (Kestrel для C#, Tomcat для Java, Gunicorn для Python);
+                    * Отдельный web-сервер, не зависящий от стека (Nginx, Apache, LiteSpeed).
+
+                    Если стандартная библиотека языка позволяет написать простой web-сервер без лишних усилий (например, под NodeJS и Go), то используют её.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```js
+                    const http = require("http");
+
+                    function server(_, response) {
+                        response.setHeader("Content-Type", "text/html; charset=utf-8;");
+                        response.write("<h2>Привет мир</h2>");
+                        response.end();
+                    }
+
+                    http.createServer(server).listen(3000, () => {
+                        console.log("Сервер запущен по адресу http://localhost:3000");
+                    });
+                    ```
+
+                    Пример web-сервера для NodeJS  
+                    (но обычно всё-таки берут Express для маршрутизации)
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```go
+                    package main
+
+                    import (
+                        "fmt"
+                        "net/http"
+                    )
+
+                    func hello(w http.ResponseWriter, req *http.Request) {
+                        fmt.Fprintf(w, "<h2>Привет мир</h2>\n")
+                    }
+
+                    func main() {
+                        http.HandleFunc("/hello", hello)
+                        http.ListenAndServe(":8090", nil)
+                    }
+                    ```
+
+                    Пример web-сервера для Go
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Модульность web-приложений
+
+                    Web-приложения могут состоять из различных модулей с разной ответственностью.
+                    Поскольку целью курса является разработка именно динамического web-приложения (т.е. сервера приложения),
+                    для упрощения жизни мы будем пользоваться фреймворком Nest.js и его экосистемой.
+
+                    <div> <!-- .element: class="fragment" -->
+
+                    В целом web-приложения содержат следующие крупные модули:
+
+                    * Модуль разрешения запроса (разрешение адреса, аутентификация)
+                    * Модуль обработки запроса (выполнение нужного метода, передача параметров)
+                    * Модуль формирования ответа (формирование заголовков и их отправка с ответом)
+
+                    Естественно, эти модули внутри себя разбиваются на более конкретные, как стандартные, 
+                    так и отвечающие за логику конкретного приложения.
+
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Размещение web-сервера
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Размещение web-сервера
+
+                    После разработки приложения встаёт вопрос, где оно будет выполняться (т.е. где его развернуть).
+
+                    Различных вариантов много:
+
+                    * Физический выделенный сервер (Dedicated Server);
+                    * Виртуальный выделенный сервер (Virtual Dedicated/Private Server);
+                    * Виртуальный хостинг (Shared Hosting);
+                    * Управляемый хостинг (Managed Hosting);
+                    * Platform-as-a-Service.
+
+                    Посмотрим на их достоинства и недостатки.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Физический выделенный сервер
+
+                    Выделенный сервер исходно кажется хорошим вариантом: полная свобода действий в плане выбора 
+                    софта и в целом управления (так как есть доступ к `root`), большое количество ресурсов в распоряжении и возможность их конфигурировать.
+                    С другой стороны, большая степень свободы накладывает большую ответственность за грамотное 
+                    администрирование сервера (чтобы, например, ваш сервер не попал в ботнет или чтобы сбойный диск был заменён).
+
+                    К тому же, выделенный железный сервер стоит сильно дороже по сравнению со следующим вариантом, 
+                    а большое количество ресурсов на начальных этапах (и не начальных тоже) обычно не требуется.
+
+                    Подытоживая, выделенные сервера хороши, но для тех, кто знает, на что идёт, и готов за это платить.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Виртуальный выделенный сервер
+
+                    Виртуальный выделенный сервер отличается от физического тем, что в ваше распоряжение даётся 
+                    не существующая в реальности машина, а виртуальная. Это дешевле, поскольку физический сервер делится
+                    на несколько виртуальных, но по производительности уступает не так сильно, потому что виртуальные сервера
+                    всё щё изолированы друг от друга.
+
+                    Это проще с точки зрения управления железом, поскольку оно от вас абстрагировано, 
+                    но управление самой ОС всё ещё на вас, поэтому этот вариант чаще всего выбирают те, 
+                    кто готов самостоятельно всё настраивать.
+                    
+                    Иногда выделяют виртуальный выделенный сервер и виртуальный приватный сервер. Они отличаются тем,
+                    что выделенный сервер - это именно виртуальная машина с полноценной виртуализацией, 
+                    а приватный сервер - машина с виртуализацией на уровне ядра операционной системы.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Виртуальный хостинг
+
+                    Ещё более дешёвый вариант, в котором одной виртуальной машиной пользуется несколько человек.
+                    Чтобы пользователи не влияли друг на друга, их ограничивают в правах на управление сервером.
+                    Если всё это вас устраивает, то почему бы и нет :)
+
+                    С другой стороны, если на виртуалке попадётся недобросовестный пользователь, забивающий ресурсы
+                    своим приложением, то вам ничего не достанется, и ваше приложение будет выполняться не так эффективно,
+                    как хотелось бы. Ещё один минус - ограничения по стеку: обычно такие решения поддерживают простые 
+                    типовые вещи из разряда скриптов на PHP, и развернуть что-то своё нельзя.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Управляемый хостинг
+
+                    Вариант размещения приложения, когда, на самом деле, за вас разворачивают и настраивают какое-то готовое приложение
+                    (например, CMS) и предоставляют вам доступ к нему. Получается, что обслуживание самого сервера - не ваша задача,
+                    и это несомненный плюс.
+
+                    С другой стороны, управляемый хостинг имеет те же проблемы, что и виртуальный хостинг, поскольку все пользователи
+                    зачастую находятся на одном физическом сервере.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Platform-as-a-Service
+
+                    PaaS предлагает несколько иную модель по сравнению с перечисленными выше подходами. Такие сервисы
+                    предоставляют набор готовых компонентов для развёртывания приложений и дополнительные возможности
+                    управления этими приложениями. Среди компонентов можно выделить:
+                    
+                    <div> <!-- .element: class="fragment" -->
+
+                    * Среды для запуска приложений на разных языках программирования и конкретных фреймворках;
+                    * Различные СУБД, как реляционные, так и нереляционные;
+                    * Брокеры сообщений и очереди;
+                    * Хранилища файлов.
+
+                    </div>
+                    <div> <!-- .element: class="fragment" -->
+
+                    Дополнительные возможности, предоставляемые PaaS:
+
+                    * Автоматическое развёртывание по событиям в целевом репозитории;
+                    * Мониторинг и оповещения;
+                    * Быстрое масштабирование в случае повышения нагрузки.
+
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Platform-as-a-Service
+
+                    Уровень входа в такие сервисы ниже, но за удобства такого плана приходится платить больше, чем за VDS 
+                    и иногда даже DS, поскольку администрирование как физических серверов, так и операционной системы 
+                    берут на себя специалисты компании.
+                    
+                    Ещё один минус - привязка к конкретной платформе: для развёртывания сложных приложений
+                    нужно писать отдельную конфигурацию именно под платформу, различные внешние зависимости приложения (например, БД)
+                    тоже становятся завязанными на платформу и так далее. Всё это снижает вероятность перехода к конкурентам.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Platform-as-a-Service
+
+                    В основе большинства PaaS-решений лежит понятие контейнера, который представляет собой изолированную среду выполнения
+                    приложения (что-то вроде Docker, но не совсем). Одно приложение может запускаться в нескольких контейнерах параллельно,
+                    что обеспечивает горизонтальное масштабирование.
+
+                    Раньше одним из популярных PaaS-решений был Heroku, но после отмены бесплатного плана и повышения цен
+                    свои услуги активнее стали продвигать конкуренты, в т.ч. Render, которым мы будем пользоваться в лабораторных работах.
+                    Самое главное, что это всё бесплатно.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    # Вопросы?
+                </textarea>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.js" integrity="sha512-35L3EFHQcGaTZ6QN9wAg9iK1hTPVCn8RGsscuXjm5JdmDRyOw+/IWJ4wavGkozQ8VDoddD7nV1psHgu/BYNpxQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js" integrity="sha512-tDzEYXTFwGOO3tWp8oTV3yGeZ4lG4gUt+tJFQTsP7W4jV/MJ1Rgr6m9aICicjh/ymL5GD6jkHXDi9cHKfctFGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/markdown/markdown.min.js" integrity="sha512-4exkEeyVuaWUFKozXl6L3UCugl6ai1cKnrVFkWUstdrNB2sDxxmPEaHBzTlYm9wX78EjPzEBG0s8k37oPeUFIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/highlight/highlight.min.js" integrity="sha512-xkVKkN0o7xECTHSUZ9zdsBYRXiAKH7CZ3aICpW6aQJZsufVVRLhEBTDjTpC1tPzm+gNZiOeW174zXAB2fOLsTg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js-mermaid-plugin@11.4.1/plugin/mermaid/mermaid.js"></script>
+    <script>
+        // More info about initialization & config:
+        // - https://revealjs.com/initialization/
+        // - https://revealjs.com/config/
+        Reveal.initialize({
+            width: 1600,
+            height: 900,
+            margin: 0.1,
+
+            slideNumber: 'c/t',
+            controls: false,
+            hash: true,
+
+            // Learn about plugins: https://revealjs.com/plugins/
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMermaid]
+        });
+    </script>
+</body>
+
+</html>
