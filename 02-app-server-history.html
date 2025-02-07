@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Лекция 2. Подходы к разработке web-приложений</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reset.min.css" integrity="sha512-Mjxkx+r7O/OLQeKeIBCQ2yspG1P5muhAtv/J+p2/aPnSenciZWm5Wlnt+NOUNA4SHbnBIE/R2ic0ZBiCXdQNUg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css" integrity="sha512-0AUO8B5ll9y1ERV/55xq3HeccBGnvAJQsVGitNac/iQCLyDTGLUBMPqlupIWp/rJg0hV3WWHusXchEIdqFAv1Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/white.min.css" integrity="sha512-NJYOiL4HPnu7QvvGcvHAnVVz2X6qWcTDAH4x3fmUOW/SGUbK46IbzHhQ1KoKDfK2trs5RwUu03Ax9sxjqz1iQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/white.min.css" integrity="sha512-NJYOiL4HPnu7QvvGcvHAnVVz2X6qWcTDAH4x3fmUOW/SGUbK46IbzHhQ1KoKDfK2trs5RwUu03Ax9sxjqz1iQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --r-heading-font: "Source Sans 3", sans-serif;
+            --r-main-font: "Source Sans 3", sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section data-markdown>
+                <textarea data-template>
+                    # Подходы к разработке web-приложений
+                      
+                    От CGI до MVC и дальше
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Подходы к разработке web-приложений
+
+                    Одного динамического web-сервера, разумеется, мало, чтобы запустить приложение, нужно само приложение :)
+
+                    Можно выделить четыре подхода к разработке web-приложений:
+
+                    * Подходы, основанные на программировании или скриптах: 
+                    внешние программы или скрипты; расширения web-сервера
+                    (плагины к Nginx, скрипты на Lua, и т.д.);
+                    <!-- .element: class="fragment" -->
+                    * Подходы, основанные на использовании шаблонов web-страниц,
+                    включающих вставки кода скриптов и специальных серверных 
+                    тегов (скрипты типа .php, .pl для отдельных обработчиков);
+                    <!-- .element: class="fragment" -->
+                    * Многостраничные web-приложения, реализованные как единый проект 
+                    (например, приложения с использованием паттерна MVC);
+                    <!-- .element: class="fragment" -->
+                    * Одностраничные фронтенд-приложения с бэкендом, предоставляющим API.
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ## Программные подходы
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Расширения и скрипты web-сервера
+
+                    Это самый простой способ разработки приложений: не нужно писать отдельное приложение,
+                    достаточно указать необходимые обработчики и при необходимости использовать
+                    имеющуюся в виде плагинов функциональность.
+
+                    Минус тоже очевидный: приложение сложнее "Hello World!" написать и поддерживать затруднительно.
+                    
+                    ```nginx
+                    server {
+                        location / {
+                            content_by_lua '
+                                local redis = require "nginx.redis"
+                                local red = redis:new()
+                                local ok, err = red:connect("127.0.0.1", 6379)
+                                ok, err = red:incr("test")
+                                local res, err = red:get("test")
+                                ngx.say("hits: ", res)
+                            ';
+                        }
+                    }
+                    ```
+                </textarea>
+            </section>
+            <section data-markdown data-background-image="images/nginx.png" data-background-size="contain">
+                <textarea data-template>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Программные подходы
+
+                    Здесь в качестве web-приложения выступает внешняя программа или скрипт, выполняемый 
+                    внешней программой-интерпретатором.
+
+                    При таком подходе часто используется следующая схема: отдельно стоящий web-сервер 
+                    (Nginx или Apache) отвечает за маршрутизацию и при совпадении адреса ресурса запускает
+                    внешнюю программу, после чего отправляет клиенту результат её работы.
+
+                    Основная проблема этого подхода — жёсткая привязка всего приложения, в т.ч. разметки, к скрипту.
+                    Это значит, что если нужно будет поменять только оформление страницы, для этого всё равно
+                    нужно будет привлекать программиста, чтобы он доработал код.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Common Gateway Interface (CGI)
+
+                    Как было сказано ранее, основная работа при программном подходе отдаётся на откуп 
+                    внешней программе. Возникает вопрос, каким образом мы можем передавать ей на вход
+                    данные из HTTP-запроса и получать от неё готовую HTML-страницу.
+
+                    Первой широко распространённой технологией, не зависящей от используемого web-сервера 
+                    и языка программирования, стала **Common Gateway Interface (CGI)**. Она определяет простое
+                    взаимодействие программы с сервером, чтобы её можно было выполнять на разных серверах 
+                    и операционных системах.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```perl
+                    #!/usr/bin/perl
+
+                    use CGI;
+
+                    print "Content-type: text/html\n\n";
+
+                    $my_cgi = new CGI;
+                    $your_name = $my_cgi->param('name');
+
+                    print "Hello $your_name!!!";
+                    ```
+
+                    Пример CGI-программы на Perl
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```c
+                    #include <stdio.h>
+                    #include <stdlib.h>
+                    
+                    int main(void) {
+                        char *data;
+                        long m, n;
+                        
+                        printf("%s%c%c\n", "Content-Type:text/html;charset=iso-8859-1", 13, 10);
+                        printf("<TITLE>Multiplication results</TITLE>\n");
+                        printf("<H3>Multiplication results</H3>\n");
+                        
+                        data = getenv("QUERY_STRING");
+                        if (data == NULL)
+                            printf("<P>Error! Error in passing data from form to script.");
+                        else if (sscanf(data, "m=%ld&n=%ld", &m, &n) != 2)
+                            printf("<P>Error! Invalid data. Data must be numeric.");
+                        else
+                            printf("<P>The product of %ld and %ld is %ld.", m, n, m * n);
+                        
+                        return 0;
+                    }
+                    ```
+
+                    Пример CGI-программы на C
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Common Gateway Interface (CGI)
+
+                    В целом, как можно заметить, подойдёт любой язык программирования, умеющий работать
+                    со стандартным вводом-выводом. Кроме языков программирования общего назначения,
+                    можно использовать скриптовые языки, например, Perl или PHP, тогда они будут
+                    выполняться через соответствующий интерпретатор.
+
+                    <div> <!-- .element: class="fragment" -->
+                    Требования к CGI-программе простые:
+
+                    * На вход программа получает параметры из запроса в виде переменных окружения или 
+                    аргументов функции `main`;
+                    * Программа должна вывести в стандартный вывод результат, который нужно отдать 
+                    клиенту (берётся весь стандартный вывод, а не первое, что вывелось);
+                    * Программа обязательно должна указать тип возвращаемых данных
+                    (заголовок `Content-Type`).
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Common Gateway Interface (CGI)
+
+                    Что не так с CGI? Много чего:
+
+                    * На каждый запрос web-сервер создаёт новый процесс, что в случае нагрузки
+                    сильно бьёт по производительности сервера (конкуренция за CPU и RAM, а также
+                    время на создание и завершение процесса);
+                    <!-- .element: class="fragment" -->
+                    * Нужно быть именно программистом, чтоб делать даже простейшие приложения;
+                    <!-- .element: class="fragment" -->
+                    * Разметка смешивается с бизнес-логикой и логикой генерации страницы, т.е. даже
+                    дизайнер должен быть программистом (или иметь программиста под боком).
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## FastCGI
+
+                    Развитием идеи CGI является технология **FastCGI**. Его отличие от CGI — использование
+                    одного процесса и очереди запросов, которую обрабатывает процесс. Такая модель позволяет
+                    использовать один процесс вместо N и при необходимости провести инициализацию единожды.
+
+                    Взаимодействие с web-сервером происходит не через стандартный ввод-вывод, а через сокеты
+                    (либо сетевые, либо внутренние в Unix-like и Windows), что уже чуть сложнее.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## FastCGI
+
+                    Тем не менее, обычно библиотеки для работы с FastCGI скрывают детали реализации от
+                    разработчика, и достаточно написать что-то такое:
+
+                    ```perl
+                    #!/usr/bin/perl
+
+                    use FCGI;
+
+                    my $socket = FCGI::OpenSocket(":9000", 5);
+                    my $request = FCGI::Request(\*STDIN, \*STDOUT, \*STDERR, \%ENV, $socket);
+                    my $count = 1;
+
+                    while($request->Accept() >= 0) {
+                        print "Content-Type: text/plain\r\n\r\n";
+                        print $count++;
+                    };
+                    ```
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Internet Server API
+
+                    Microsoft для своего web-сервера IIS (Internet Information Server) разработала интерфейс
+                    **Internet Server API (ISAPI)**. Поскольку тут используются особенности самого IIS, приложения
+                    выполняются быстрее по сравнению с CGI. В этом плане ISAPI больше похож на FastCGI,
+                    но тут вместо очереди запросов используются потоки.
+
+                    <div> <!-- .element: class="fragment" -->
+                    К IIS модули, написанные с использованием ISAPI, подключаются в виде DLL, формирующих страницы.
+                    Модули бывают двух типов:
+
+                    * Расширения, в которых и реализуются полноценные приложения, имеющие доступ ко всей функциональности IIS;
+                    * Фильтры, обрабатывающие и модифицирующие запросы клиентов и ответы на них.
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Internet Server API
+
+                    В теории писать модули можно на любых языках, которые можно собрать в DLL, главное, чтобы 
+                    собранный исполняемый файл предоставлял три функции:
+
+                    * `BOOL WINAPI GetExtensionVersion(HSE_VERSION_INFO* pVer)`;
+                    * `BOOL WINAPI TerminateExtension(DWORD dwFlags)`;
+                    * `DWORD WINAPI HttpExtensionProc(LPEXTENSION_CONTROL_BLOCK lpECB)`.
+
+                    На практике расширения и фильтры разрабатывались на C, C++ и Delphi.
+
+                    Если появится желание погрузиться в историю, можно посмотреть реализацию расширения
+                    [вот тут](https://rsdn.org/article/inet/wrisapi.xml).
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Java Servlet API
+
+                    Ещё одна технология, завязанная на вендора — **Java Servlet API**, который связывает 
+                    web-сервер с JVM. За выполнение сервлетов и управление сеансами отвечает специальная
+                    программа, контейнер сервлетов.
+
+                    Java Servlet API — это более распространённая технология по сравнению с ISAPI за счёт
+                    кроссплатформенности самой Java. Известные реализации контейнера сервлетов:
+                    Apache Tomcat, WildFly и Jetty.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```java
+                    import java.io.PrintWriter;
+                    import java.io.IOException;
+                    import javax.servlet.ServletException;
+                    import javax.servlet.annotation.WebServlet;
+                    import javax.servlet.http.HttpServlet;
+                    import javax.servlet.http.HttpServletRequest;
+                    import javax.servlet.http.HttpServletResponse;
+                     
+                    @WebServlet("/hello")
+                    public class HelloServlet extends HttpServlet {
+                     
+                        protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+                                throws ServletException, IOException {
+                             
+                            response.setContentType("text/html");
+                            PrintWriter writer = response.getWriter();
+                            try {
+                                writer.println("<h2>Hello from HelloServlet</h2>");
+                            } finally {
+                                writer.close();  
+                            }
+                        }
+                    }
+                    ```
+
+                    Пример сервлета, отвечающего на GET-запрос `/hello`
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ## Шаблоны web-страниц
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Шаблоны web-страниц
+
+                    Подходы, основанные на шаблонах, в качестве ресурса используют не исполняемые файлы,
+                    а специальные **шаблоны**. Шаблон — это HTML-страница, в которой есть вставки в виде
+                    нестандартных серверных тегов, которые обрабатываются не браузером, а web-сервером.
+                    По смыслу это вывернутый наизнанку CGI, поскольку в этот раз основой является не код,
+                    а разметка.
+
+                    Технологий достаточно много: SSI, Cold Fusion, ASP, JSP. Как и CGI с аналогами, сейчас
+                    всё это тоже используется не очень часто.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Server Side Includes (SSI)
+
+                    Технология вставок на стороне сервера **Server Side Includes** — довольно старая технология,
+                    которая появилась почти одновременно с CGI.
+
+                    Основная суть — вставка HTML-комментариев специального формата с инструкциями, которые
+                    обрабатываются web-сервером до отправки ответа клиенту. Инструкции бывают разные: вставить
+                    содержимое другого файла, вывести значение переменной, проверить условие и пр.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```html
+                    <html> 
+                        <body>  
+                        <head>
+                            <title>Test Page</title> 
+                        </head> 
+                            <!--#include virtual="/ssi/header.html" --> 
+                            <h1>Тестовая страница</h1>
+                            <p>Некий текст</p>
+                            <!--#include virtual="/ssi/global_menu.html" -->
+                            <!--#include virtual="/ssi/footer.html" -->
+                         </body>
+                    </html>
+                    ```
+
+                    Пример SSI-страницы с выделенной шапкой, подвалом и навигацией
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## ColdFusion
+
+                    Технология **ColdFusion** от Adobe также позволяет создавать web-приложения на основе
+                    шаблонов. Это, по сути, скриптовый язык программирования, который использует XML
+                    непосредственно для текста программ. Странное решение :)
+
+                    С другой стороны, это позволяет дизайнеру или верстальщику самостоятельно править разметку,
+                    а поскольку сами управляющие конструкции чем-то похожи на HTML, то со временем простые 
+                    исправления кода также становятся им подвластны. К тому же, Adobe до сих пор поддерживает
+                    и обновляет ColdFusion.
+
+                    Ещё один плюс — наличие специализированных инструментальных средств именно под ColdFusion,
+                    есть как специальная IDE, так и плагины для других IDE.
+                </textarea>
+            </section>
+            <section data-markdown data-background-image="images/coldfusion.png" data-background-size="contain">
+                <textarea data-template>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## PHP: Hypertext Preprocessor
+
+                    **PHP** исходно задумывался именно как язык для вставки небольших фрагментов кода
+                    в разметку и обработки данных из форм (до версии 3.0 акроним расшифровывался как *Personal 
+                    Home Page*). Вставка кода в разметку очень простая: код пишется внутри блока вида
+                    `<?php ... ?>`, а HTML-разметка вне таких блоков, как в обычном файле. По сути, всё,
+                    что не в блоках кода, выводится интерпретатором с помощью `print` (это, кстати, не функция).
+
+                    <div> <!-- .element: class="fragment" -->
+                    PHP можно использовать на подавляющем количестве web-серверов, что обусловлено его
+                    распространённостью, несмотря на неоднозначное отношение.
+
+                    Спорная репутация PHP в основном связана с плохим дизайном самого языка. С выходом версии 7.0 
+                    ситуация стала исправляться, и сейчас это толковый язык программирования, нацеленный на разработку 
+                    в том числе комплексных web-приложений.
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```php
+                    <?php
+                    if (str_contains($_SERVER['HTTP_USER_AGENT'], 'Firefox')) {
+                    ?>
+                        <h3>str_contains() returned true</h3>
+                        <p>You are using Firefox</p>
+                    <?php
+                    } else {
+                    ?>
+                        <h3>str_contains() returned false</h3>
+                        <p>You are not using Firefox</p>
+                    <?php
+                    }
+                    ?>
+                    ```
+
+                    Пример кода на PHP с проверкой User-Agent
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Active Server Pages (ASP)
+
+                    Как всегда, Microsoft отличилась и сделала свой PHP под названием **Active Server 
+                    Pages (ASP)**. Чем оно отличается от PHP:
+
+                    * В качестве языка программирования используется VBScript;
+                    * Входит в состав IIS и используется в основном с ним;
+                    * Можно использовать OLE- и COM-объекты, в том числе источникам данных ODBC.
+
+                    Пример простой ASP-страницы, которая выводит день недели и месяц:
+
+                    ```html
+                    <!DOCTYPE html>
+                    <html>
+                        <body>
+                            Today it is <% response.write(WeekdayName(weekday(date))) %>, <br>
+                            and the month is <% response.write(MonthName(month(date))) %>
+                        </body>
+                    </html>
+                    ```
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Java Server Pages (JSP)
+
+                    Ответ Sun (ныне Oracle) на ответ Microsoft под названием **Java Server Pages (JSP)**.
+                    Отличия от ASP и PHP:
+
+                    * В качестве языка программирования используется Java;
+                    * Выполняются в контейнере сервлетов;
+                    * Реализует библиотеку серверных JSP-тегов (похоже на ColdFusion).
+
+                    Под капотом JSP-страница преобразовывается в сервлет, про которые мы уже говорили.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```html
+                    <!DOCTYPE html>
+
+                    <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+                    <%@ page import="java.util.*, java.text.*" %>
+                    
+                    <%! 
+                    String getFormattedDate() 
+                    { 
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss"); 
+                        return sdf.format(new Date()); 
+                    } 
+                    %>
+
+                    <html>
+                        <head>
+                            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                            <title>Добро пожаловать, JSP!</title>
+                        </head>
+                        <body>
+                            <h1>Добро пожаловать!</h1>
+                            <i>Сегодня <%= getFormattedDate() %></i>
+                        </body>
+                    </html>
+                    ```
+
+                    Пример JSP-страницы, которая выводит текущее время
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ## Многостраничные web-приложения
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Многостраничные приложения
+
+                    Все технологии, перечисленные до этого, могут использовать какие-то объекты,
+                    но при этом самих средств ООП для разработки непосредственно web-приложений 
+                    в них не было. Разумным развитием виделось как раз внедрение 
+                    объектно-ориентированных технологий в web-разработку. Это бы позволило разрабатывать
+                    web-приложения схожим образом с классическими приложениями.
+
+                    <div> <!-- .element: class="fragment" -->
+                    Основная мысль на данном этапе — отделить содержание от представления, то есть
+                    вынести логику работы с данными от вывода данных в конкретном формате. 
+                    Это отделение пошло двумя разными путями:
+
+                    * Web-формы, связанные с описанием классов на сервере;
+                    * Применение паттерна MVC.
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Web-формы
+
+                    Подход с использованием **web-форм** развивает идеи подхода с использованием шаблонов.
+                    По сути, каждая такая форма — это класс на стороне сервера, описывающий сам объект,
+                    и набор тегов, отвечающий за работу с объектами на стороне клиента. Бизнес-логика 
+                    в таких приложениях пишется быстрее по сравнению с шаблонами, но большого распространения
+                    этот подход не получил, поскольку оказался менее удобным по сравнению с MVC.
+
+                    Из технологий для разработки web-форм можно вспомнить ASP.NET Web Forms и Java Server Faces.
+                </textarea>
+            </section>
+            <section data-markdown data-background-image="images/aspnet-forms.png" data-background-size="contain">
+                <textarea data-template>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Паттерн Model-View-Controller (MVC)
+
+                    Про **Model-View-Controller** вам наверняка рассказывали в рамках ООП, но широкое 
+                    распространение он получил как раз в web-разработке по причине, которая была упомянута 
+                    ранее: отделение представления от логики. Напомним, что приложение делится на три компонента:
+
+                    * **Модель**, которая предоставляет данные и реагирует на команды контроллера;
+                    * **Представление**, которое отображает данные модели пользователю и реагирует на изменение модели;
+                    * **Контроллер**, который интерпретирует действия пользователя, оповещая модель о необходимости изменений.
+
+                    Это, на самом деле, общее описание, которое везде одинаково, а конкретные детали реализации
+                    являются темой бесконечных обсуждений :)
+                </textarea>
+            </section>
+            <section data-markdown data-background-image="images/mvc.png" data-background-size="contain">
+                <textarea data-template>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Паттерн Model-View-Controller (MVC)
+
+                    Проговорим, за что отвечает каждый компонент именно в контексте web-приложений.
+
+                    **Модель (Model)** — это набор классов, реализующих всю бизнес-логику web-приложения. 
+                    Эти классы отвечают за обработку данных (сущностей), размещение их в БД, чтение из БД, 
+                    а также за взаимодействие между самими объектами, составляющими такие данные.
+
+                    В современных условиях модель часто представляется не в виде единого класса, а набора классов
+                    которые отвечают отдельно за бизнес-логику и отдельно за взаимодействие с БД.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Паттерн Model-View-Controller (MVC)
+
+                    **Представление (View)** — набор классов и шаблонов, отвечающих за интерфейс взаимодействия 
+                    с пользователями (User Interface, UI). Обычно они формируют HTML-страницы, показывающие 
+                    пользователям данные из модели. На основе данных модели пользователям представляется возможность 
+                    их просматривать и редактировать.
+
+                    Обратите внимание, что для формирования представлений используются преимущественно шаблоны.
+                    Технически это не совсем те шаблоны, которые обсуждались ранее, но суть такая же. Для шаблонизации
+                    используются специальные библиотеки, **шаблонизаторы**.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Паттерн Model-View-Controller (MVC)
+
+                    **Контроллер (Controller)** — это связующее звено между первыми двумя компонентами. Классы данного 
+                    компонента получают данные, содержащиеся в запросе к серверу (например, значения, полученные из 
+                    отправленной формы) и передают их в *Модель* для обработки и сохранения. После этого *Контроллер*
+                    выбирает, каким способом показать их клиенту с помощью использования некоторого *Представления*, 
+                    и передает ему данные для формирования HTML-ответа.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Паттерн Model-View-Controller (MVC)
+
+                    Примеры фреймворков, использующих паттерн MVC:
+
+                    * Spring Framework (Java);
+                    * ASP.NET MVC (.NET);
+                    * Laravel и Symfony (PHP);
+                    * Nest.js (JS);
+                    * Ruby on Rails (Ruby);
+                    * Django (Python).
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ## API для одностраничных приложений
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## API для одностраничных приложений
+
+                    Дальнейшее развитие MVC-приложений привело к тому, что представление полностью ушло в отдельные
+                    одностраничные приложения (Single Page Application), а бэкенд стал предоставлять сериализованные
+                    данные в виде API.
+
+                    Web-приложений с такой архитектурой сейчас, на самом деле, большинство, и все фреймворки,
+                    которые когда-то поддерживали только MVC, сейчас поддерживают и создание непосредственно API.
+                    Современные фреймворки в целом идут от противного и сначала реализуют средства поддержки для
+                    разработки API и только потом дают возможность использовать MVC, обычно в качестве плагинов.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## API для одностраничных приложений
+
+                    С течением времени технологии разработки именно такого бэкенда усложнялись, поскольку требований
+                    становилось всё больше. Охватить все технологии в рамках одной лекции затруднительно, собственно, 
+                    для этого у нас есть оставшиеся лекции :)
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    # Вопросы?
+                </textarea>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.js" integrity="sha512-35L3EFHQcGaTZ6QN9wAg9iK1hTPVCn8RGsscuXjm5JdmDRyOw+/IWJ4wavGkozQ8VDoddD7nV1psHgu/BYNpxQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js" integrity="sha512-tDzEYXTFwGOO3tWp8oTV3yGeZ4lG4gUt+tJFQTsP7W4jV/MJ1Rgr6m9aICicjh/ymL5GD6jkHXDi9cHKfctFGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/markdown/markdown.min.js" integrity="sha512-4exkEeyVuaWUFKozXl6L3UCugl6ai1cKnrVFkWUstdrNB2sDxxmPEaHBzTlYm9wX78EjPzEBG0s8k37oPeUFIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/highlight/highlight.min.js" integrity="sha512-xkVKkN0o7xECTHSUZ9zdsBYRXiAKH7CZ3aICpW6aQJZsufVVRLhEBTDjTpC1tPzm+gNZiOeW174zXAB2fOLsTg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js-mermaid-plugin@11.4.1/plugin/mermaid/mermaid.js"></script>
+    <script>
+        // More info about initialization & config:
+        // - https://revealjs.com/initialization/
+        // - https://revealjs.com/config/
+        Reveal.initialize({
+            width: 1600,
+            height: 900,
+            margin: 0.1,
+
+            slideNumber: 'c/t',
+            controls: false,
+            hash: true,
+
+            // Learn about plugins: https://revealjs.com/plugins/
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMermaid]
+        });
+    </script>
+</body>
+
+</html>
