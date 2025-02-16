@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Лекция 3. Предметно-ориентированное проектирование, часть 1</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reset.min.css" integrity="sha512-Mjxkx+r7O/OLQeKeIBCQ2yspG1P5muhAtv/J+p2/aPnSenciZWm5Wlnt+NOUNA4SHbnBIE/R2ic0ZBiCXdQNUg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css" integrity="sha512-0AUO8B5ll9y1ERV/55xq3HeccBGnvAJQsVGitNac/iQCLyDTGLUBMPqlupIWp/rJg0hV3WWHusXchEIdqFAv1Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/white.min.css" integrity="sha512-NJYOiL4HPnu7QvvGcvHAnVVz2X6qWcTDAH4x3fmUOW/SGUbK46IbzHhQ1KoKDfK2trs5RwUu03Ax9sxjqz1iQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/white.min.css" integrity="sha512-NJYOiL4HPnu7QvvGcvHAnVVz2X6qWcTDAH4x3fmUOW/SGUbK46IbzHhQ1KoKDfK2trs5RwUu03Ax9sxjqz1iQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --r-heading-font: "Source Sans 3", sans-serif;
+            --r-main-font: "Source Sans 3", sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section data-markdown>
+                <textarea data-template>
+                    # Предметно-ориентированное проектирование 1
+                    
+                    DDD и все-все-все (почти)
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## О чём речь?
+
+                    Простые приложения можно писать, просто применяя паттерн MVC и реализуя всю бизнес-логику в модели.
+
+                    ```text
+                    cool-project/
+                    ├── controllers/
+                    │   └── users.controller.ts   (40 SLoC)
+                    └── models/
+                        └── users.model.ts        (150 SLoC)
+                    ```
+
+                    N.B. **SLoC**&nbsp;— Source Lines of Code
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## О чём речь?
+
+                    Однако с увеличением приложения моделей становится больше, они сами становятся больше, связей между
+                    ними становится больше...
+                    
+                    ```text
+                    cool-project/
+                    ├── controllers/
+                    │   ├── admin.controller.ts   (180 SLoC)
+                    │   ├── likes.controller.ts   (30 SLoC)
+                    │   ├── posts.controller.ts   (60 SLoC)
+                    │   ├── stats.controller.ts   (40 SLoC)
+                    │   └── users.controller.ts   (90 SLoC)
+                    └── models/
+                        ├── admin.model.ts        (640 SLoC)
+                        ├── likes.model.ts        (50 SLoC)
+                        ├── posts.model.ts        (310 SLoC)
+                        ├── stats.model.ts        (220 SLoC)
+                        └── users.model.ts        (490 SLoC)
+                    ```
+
+                    И в итоге всё превращается в большой комок грязи.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ### Как этого избежать?
+                    
+                    ### Обычно ответ на этот вопрос и даёт предметно-ориентированное проектирование
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Предметно-ориентированное проектирование (DDD)
+
+                    **Предметно-ориентированное проектирование (Domain-driven development, DDD)**&nbsp;— это подход к разработке ПО, 
+                    который во главу угла ставит предметную область в целом или какую-то её часть в виде бизнес-процессов.
+
+                    <div class="fragment"> 
+                    Когда программист пишет код без использования DDD, он делает акцент на том, как выполнить
+                    ту или иную техническую задачу: отправить что-то в очередь, записать данные в БД и так далее.
+
+                    Когда появляется DDD, программист начинает смотреть на код через призму бизнеса, т.е. пытается
+                    думать так, как бизнес.
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Предметно-ориентированное проектирование (DDD)
+
+                    Какие плюсы даёт такой подход:
+
+                    * Появляется общая модель всего приложения;
+                    * Бизнес начинает общаться с разработчиками;
+                    * Лучшее понимание UI за счёт понимания потребностей пользователей;
+                    * Лучшее понимание программной архитектуры приложения.
+
+                    Плюсы, естественно, не бесплатные: DDD требует большего вложения времени и усилий со стороны разработчиков.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ## DDD на верхнем уровне
+
+                    Много анализа, немного кода
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Домен и поддомены
+
+                    Основной концепцией DDD является домен. **Домен**&nbsp;— это в целом вся предметная область, которая нас интересует.
+
+                    Вся предметная область&nbsp;— это сильное заявление, поэтому для упрощения понимания домен делится на части,
+                    которые называются **поддоменами**.
+
+                    <div class="fragment">
+                    Поддомены делятся на три категории:
+                    
+                    * Смысловое ядро (core subdomains);
+                    * Служебные поддомены (supporting subdomains);
+                    * Неспециализированные поддомены (generic subdomains).
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Домен и поддомены
+
+                    **Смысловое ядро**&nbsp;— это поддомен, который является ключевым для бизнеса. Для небольших
+                    и иногда даже средних приложений оно одно, для крупных приложений их больше.
+
+                    **Служебный поддомен** также описывает часть бизнеса, но при этом не является настолько важным.
+                    <!-- .element: class="fragment" -->
+
+                    **Неспециализированный поддомен** не решает задачу именно бизнеса, но при этом всё равно нужен
+                    для корректного функционирования приложения.
+                    <!-- .element: class="fragment" -->
+
+                    Всегда стоит помнить, что поддомен попадает в ту или иную категорию в зависимости от задач,
+                    решаемых разрабатываемым продуктом.
+                    <!-- .element: class="fragment" -->
+
+                </textarea>
+            </section>
+            <section data-markdown data-auto-animate style="text-align: left">
+                <textarea data-template>
+                    ## Домен и поддомены (пример)
+
+                    Представим приложение, в котором мы как-то выделили следующие поддомены:
+
+                    * Расписание занятий; <!-- .element: data-id="schedule" -->
+                    * Запись на занятия; <!-- .element: data-id="election" -->
+                    * Учебные планы и программы дисциплин; <!-- .element: data-id="plans" -->
+                    * Учебные группы и потоки дисциплин; <!-- .element: data-id="groups" -->
+                    * Управление доступом. <!-- .element: data-id="access" -->
+
+                    Что из этого является смысловым ядром, что&nbsp;— служебными поддоменами, что&nbsp;— неспециализированными?
+                </textarea>
+            </section>
+            <section data-markdown data-auto-animate style="text-align: left">
+                <textarea data-template>
+                    ## Домен и поддомены (пример)
+
+                    * Расписание занятий&nbsp;— смысловое ядро; <!-- .element: data-id="schedule" -->
+                    * Запись на занятия&nbsp;— смысловое ядро; <!-- .element: data-id="election" -->
+                    * Учебные планы и программы дисциплин&nbsp;— служебный поддомен;  <!-- .element: data-id="plans" -->
+                    * Учебные группы и потоки дисциплин&nbsp;— служебный поддомен; <!-- .element: data-id="groups" -->
+                    * Управление доступом&nbsp;— неспециализированный поддомен. <!-- .element: data-id="access" -->
+
+                    Обратите внимание, что от случая к случаю выделение может отличаться в зависимости от домена.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Единый язык (ubiquitous language)
+
+                    Выделить поддомены&nbsp;— половина истории. Вторая половина заключается в описании поддоменов.
+                    Обычно для этого привлекаются специалисты из предметной области, и вместе с разработчиками они 
+                    анализируют домен целиком и поддомены. Если вы хорошо слушали курс по анализу и проектированию на UML, 
+                    то в целом имеете представление, как это работает :)
+
+                    Если процесс описания идёт хорошо, то на выходе получится **единый язык (ubiquitous language)**.
+                    Эта концепция позволяет общаться всем причастным на одном языке.
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Единый язык (ubiquitous language)
+
+                    Ещё раз подчеркнём: для DDD жизненно необходимо активное участие (а не только присутствие)
+                    эксперта, разбирающегося в предметной области, для которой разрабатывается ПО. Это либо сам клиент,
+                    либо его аналитик.
+
+                    Формировать единый язык можно разными путями. Обычно начинают со словаря предметной области и продолжают
+                    диаграммами (необязательно UML). Сами поддомены тоже являются частью единого языка, и для разных поддоменов
+                    может возникнуть необходимость в различающихся определениях и понятиях.
+                    
+                    Простой способ проверить, что всё получилось правильно: попробуйте объяснить какой-нибудь термин,
+                    используя сформированный язык. В зависимости от того, получится это или нет, можно сказать, правильно ли
+                    сформирован UL.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Ограниченные контексты (Bounded contexts)
+
+                    В целом, когда мы говорим про домен и поддомены, мы всегда отталкиваемся от того, **какие** именно задачи
+                    хочет бизнес.
+
+                    С другой стороны, даже внутри одного поддомена существует ненулевая вероятность разногласий в плане
+                    единого языка, и такую ситуацию тоже нужно спроектировать.
+
+                    <div class="fragment">
+
+                    Что можно сделать: выделить в рамках поддомена области, в которых единый язык не будет меняться. Такие области
+                    называют **ограниченными контекстами (bounded contexts)**.
+
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Ограниченные контексты (Bounded contexts)
+
+                    Основное назначение ограниченных контекстов&nbsp;— инкапсулировать фрагмент предметной области (и его
+                    программную реализацию), чтобы минимизировать влияние различных модулей друг на друга. Ещё одна полезная
+                    особенность: на один контекст обычно нужно выделить одну команду разработчиков.
+
+                    <div class="fragment">
+
+                    Важно понимать, что поддомены показывают нам структуру предметной области, а ограниченные контексты
+                    отражают реализацию. Что стоит помнить при выделении ограниченных контекстов:
+
+                    * Нет какого-то единственного верного способа выделения;
+                    * Ограниченные контексты могут не соотноситься с поддоменами как один-к-одному.
+                    
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Ограниченные контексты (Bounded contexts)
+
+                    Самый понятный пример, который можно привести как реализацию ограниченных контекстов&nbsp;— микросервисы.
+                    Если немного подумать, то правильно спроектированные микросервисы действительно имеют немного зависимостей и
+                    описывают один фрагмент предметной области. Но про них потом :)
+
+                    При этом микросервисы не являются единственным способом реализации контекстов, главная задача&nbsp;— 
+                    корректно разделить код всего приложения. То есть правильно спроектированный модульный монолит ничем не хуже.
+                    <!-- .element: class="fragment" -->
+
+                    Для более удобного выделения контекстов можно, например, воспользоваться диаграммой использования и на ней
+                    собрать различные варианты использования в подсистемы, эти подсистемы с большой вероятностью будут отвечать за контексты.
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Ограниченные контексты (пример)
+
+                    Развиваем прошлый пример. Напомним, что список поддоменов приложения следующий:
+
+                    * Расписание занятий&nbsp;— смысловое ядро;
+                    * Запись на занятия&nbsp;— смысловое ядро;
+                    * Учебные планы и программы дисциплин&nbsp;— служебный поддомен; 
+                    * Учебные группы и потоки дисциплин&nbsp;— служебный поддомен;
+                    * Управление доступом&nbsp;— неспециализированный поддомен.
+
+                    Какие контексты можно выделить внутри каждого поддомена и есть ли контексты, покрывающие более одного контекста?
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Ограниченные контексты (пример)
+
+                    Один из вариантов разбиения:
+
+                    * Просмотр расписания занятий;
+                    * Выбор дисциплин;
+                    * Выбор факультативов;
+                    * Учебные планы;
+                    * Рабочие программы дисциплин;
+                    * Студенты;
+                    * Учебные группы;
+                    * Потоки дисциплин;
+                    * Управление пользователями;
+                    * Управление ролями.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Карта контекстов
+
+                    Чем сложнее домен, тем сложнее выделить ограниченные контексты и **связать их**. Редко контекст бывает полностью оторванным
+                    от остальной предметной области, что приводит к нескольким вопросам:
+
+                    * Где в итоге границы контекстов?
+                    <!-- .element: class="fragment" -->
+                    * Как контексты будут взаимодействовать друг с другом?
+                    <!-- .element: class="fragment" -->
+                    * Как можно соотнести UL разных контекстов?
+                    <!-- .element: class="fragment" -->
+                    * Как изменения одних контекстов затронут другие и как это правильно обрабатывать?
+                    <!-- .element: class="fragment" -->
+
+                    Для этого в DDD есть специальная **карта контекстов**. Это, по сути, верхнеуровневая диаграмма, отвечающая на вопросы выше.
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown data-background-image="images/context-map.png" data-background-size="contain">
+                <textarea data-template>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Карта контекстов и их отношения
+
+                    Контексты могут взаимодействовать, используя разные шаблоны:
+
+                    * Партнёрство;
+                    <!-- .element: class="fragment" -->
+                    * Общее ядро;
+                    <!-- .element: class="fragment" -->
+                    * Заказчик-поставщик;
+                    <!-- .element: class="fragment" -->
+                    * Конформист;
+                    <!-- .element: class="fragment" -->
+                    * Предохранительный уровень;
+                    <!-- .element: class="fragment" -->
+                    * Служба с открытым протоколом;
+                    <!-- .element: class="fragment" -->
+                    * Общедоступный язык;
+                    <!-- .element: class="fragment" -->
+                    * Отдельное существование;
+                    <!-- .element: class="fragment" -->
+                    * Big ball of mud :)
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ## DDD на уровне работы с данными
+
+                    Столько же анализа, много кода
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Разные объекты в рамках DDD
+
+                    Когда мы говорим про предметно-ориентированное программирование, речь обычно заходит о вполне конкретных 
+                    типах объектов:
+
+                    * Сущности (entities);
+                    * Значения (value objects);
+                    * Агрегаты (aggregates).
+
+                    Давайте посмотрим на их отличия.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Сущности
+
+                    **Сущность** в рамках DDD&nbsp;— объект, в котором важен его **идентификатор**. Этот идентификатор является неотъемлемым,
+                    неизменяемым и уникальным в течение всего времени существования сущности.
+
+                    <div class="fragment">
+
+                    Что отличает сущность от всего остального:
+
+                    * Имеет смысл для конечного пользователя и бизнеса в целом;
+                    * Задаётся идентификатором:
+                        * Две сущности с одинаковым идентификатором считаются одинаковыми, даже если у них отличаются другие поля;
+                        * Две сущности, отличающиеся только идентификатором, считаются разными;
+                    * Изменяемая с точки зрения хранения в памяти (читай как иммутабельная);
+                    * Где-то сохраняется;
+                    * Имеет жизненный цикл.
+
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Сущности
+
+                    Когда мы говорим про сущности, мы пытаемся смоделировать не только данные, которые они будут хранить,
+                    но и поведение, изменяющее эти данные.
+
+                    Что имеется в виду: не должно быть ситуации, когда всё изменение модели происходит через пачку геттеров
+                    и сеттеров для каждого поля. Нужно описывать те ситуации, которые приводят к изменению данных.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```ts []
+                    class Subject {
+                        public getId(): string {}
+
+                        public getName(): string {}
+                        public setName(newName: string) {}
+                    
+                        public getDescription(): string {}
+                        public setDescription(newDescription: string) {}
+                    
+                        public getStatus(): number {}
+                        public setStatus(newStatus: number) {}
+                    }
+                    ```
+
+                    Пример плохого кода. Что не так?
+
+                    Тут ровно то, от чего предостерегает DDD: пачка геттеров и сеттеров. Исправим это...
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```ts []
+                    class Subject {
+                        public rename(newName: string) {}
+                    
+                        public setDescription(newDescription: string) {}
+                    
+                        public approve() {}
+                        public reject(reason: string) {}
+                        public archive() {}
+                    }
+                    ```
+
+                    Уже получше. Но что ещё не так?
+
+                    Мы передаём в качестве параметров просто строки, из-за этого не сможем
+                    отличить описание дисциплины от её названия в коде. Что делать?
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Объекты-значения
+
+                    В противовес сущностям ставят объекты-значения. **Объект-значение** описывается не идентификатором (которого нет), 
+                    а набором атрибутов, значения которых представляют ценность для бизнеса.
+
+                    <div class="fragment">
+
+                    Чем это отличается от сущности:
+
+                    * Не является чем-то отдельным и независимым, на самом деле, такое значение принадлежит объекту;
+                    * Поскольку нас интересует значение атрибутов, то такие объекты проще заменять, а не изменять, т.е. они неизменяемые;
+                    * Простые по структуре.
+
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```ts
+                    class SubjectName {
+                        constructor(readonly russianName: string, readonly englishName?: string) {}
+                    }
+                      
+                    class SubjectDescription {
+                        constructor(
+                          readonly abstract: string,
+                          readonly topics: string,
+                          readonly prerequisites: string,
+                          readonly results: string
+                        ) {}
+                    }
+                      
+                    class RejectionReason {
+                        constructor(readonly reason: string) {}
+                    }
+                      
+                    class Subject {
+                        public rename(newName: SubjectName) {}
+                      
+                        public setDescription(newDescription: SubjectDescription) {}
+                      
+                        public approve() {}
+                        public reject(reason: RejectionReason) {}
+                        public archive() {}
+                    }                      
+                    ```
+
+                    Доработаем прошлый пример...
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Объекты-значения
+
+                    Что нам даёт такое выделение значений:
+
+                    * Тип данных сам за себя говорит, что в нём хранится;
+                    * Можно добавить бизнес-логику, связанную с этим полем, в соответствующий класс;
+                    * Обеспечивается соблюдение инварианта такого объекта-значения.
+
+                    Часто в литературе даётся совет стараться выделять именно объекты-значения и только потом
+                    собирать их в сущности, поскольку это проще разрабатывать и поддерживать.
+
+                    N.B. Бизнес-логика при этом не должна изменять значение, т.е. все методы должны быть функциями
+                    без побочных эффектов.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Агрегаты
+
+                    Последнее, что касается проектирования данных&nbsp;— агрегаты. Под **агрегатом** понимается набор сущностей
+                    и объектов-значений со следующими характеристиками:
+
+                    * Агрегат всегда создаётся, хранится и обрабатывается как единое целое;
+                    * Агрегат всегда находится в согласованном состоянии;
+                    * Владельцем агрегата является сущность, которая называется **корнем агрегата**, её идентификатор
+                    используется для идентификации всего агрегата.
+
+                    Другими словами, агрегат&nbsp;— это составная сущность, для которой важна транзакционность. Как раз необходимость
+                    транзакционности и определяет то, что мы выделяем в агрегаты, а что оставляем в виде сущностей.
+                    <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Агрегаты
+
+                    Есть некоторые ограничения, которые накладываются на агрегаты:
+
+                    * На агрегат можно сослаться только через его корень. Не должно быть ситуации, когда осуществляется доступ к частям
+                    агретата вне самого агрегата.
+                    * За обеспечение согласованности также отвечает корень агрегата.
+
+                    При проектировании сущностей эти ограничения заставляют думать, какой должна быть сущность: корнем агрегата или частью агрегата.
+                    При этом не всегда все сущности обязаны относиться к агрегатам.
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Агрегаты
+
+                    При выделении агрегатов полезно проходиться по следующему чек-листу:
+
+                    <div class="fragment">
+
+                    Q: Как будет осуществляться доступ к сущности?  
+                    A: Если сущность нужно будет искать по идентификатору или ещё как-то, это корень агрегата.
+
+                    </div>
+
+                    <div class="fragment">
+
+                    Q: Будут ли на неё ссылаться другие агрегаты?  
+                    A: Если это верно, то это снова корень агрегата.
+
+                    </div>
+
+                    <div class="fragment">
+
+                    Q: Как сущность будет изменяться?  
+                    A: Если сущность меняется независимо, то это корень агрегата. Если при изменении сущности изменяется
+                    что-то другое, то это часть агрегата.
+
+                    </div>
+                </textarea>
+            </section>
+            <section data-markdown style="text-align: left">
+                <textarea data-template>
+                    ## Агрегаты
+
+                    Исходя из всего сказанного до этого, можно вывести некоторые правила проектирования агрегатов 
+                    и работы с ними:
+
+                    * Агрегаты должны быть как можно меньше;
+                    * Ссылаться на агрегаты нужно по их идентификатору;
+                    * За одну транзакцию должен изменяться один агрегат;
+                    * При сохранении агрегата нужно использовать оптимистическую блокировку таблиц.
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    ```ts
+                    class LessonId {
+                        constructor(public readonly id: string) {}
+                    }
+                      
+                    class LessonLoad {
+                          constructor(public readonly load: number) {}
+                    }
+                      
+                    class LessonEvent {
+                        constructor(private dateStart: Date, private dateEnd: Date) {}
+                    }
+                      
+                    class Lesson {
+                        constructor(
+                          private id: LessonId,
+                          private slots: LessonEvent[] = [],
+                          private totalLoad: LessonLoad = new LessonLoad(0)
+                        ) {}
+                      
+                        public addEvent(dateStart: Date, dateEnd: Date) {
+                          this.slots.push(new LessonEvent(dateStart, dateEnd));
+                      
+                          // Каждая пара считается за 2 единицы нагрузки
+                          this.totalLoad = new LessonLoad(this.totalLoad.load + 2);
+                        }
+                    }
+                      
+                    ```
+
+                    Пример простого агрегата. Обратите внимание, что изменяется и вложенный объект-значение,
+                    и сам корень агрегата
+                </textarea>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    # Вопросы?
+                </textarea>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.js" integrity="sha512-35L3EFHQcGaTZ6QN9wAg9iK1hTPVCn8RGsscuXjm5JdmDRyOw+/IWJ4wavGkozQ8VDoddD7nV1psHgu/BYNpxQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js" integrity="sha512-tDzEYXTFwGOO3tWp8oTV3yGeZ4lG4gUt+tJFQTsP7W4jV/MJ1Rgr6m9aICicjh/ymL5GD6jkHXDi9cHKfctFGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/markdown/markdown.min.js" integrity="sha512-4exkEeyVuaWUFKozXl6L3UCugl6ai1cKnrVFkWUstdrNB2sDxxmPEaHBzTlYm9wX78EjPzEBG0s8k37oPeUFIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/highlight/highlight.min.js" integrity="sha512-xkVKkN0o7xECTHSUZ9zdsBYRXiAKH7CZ3aICpW6aQJZsufVVRLhEBTDjTpC1tPzm+gNZiOeW174zXAB2fOLsTg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js-mermaid-plugin@11.4.1/plugin/mermaid/mermaid.js"></script>
+    <script>
+        // More info about initialization & config:
+        // - https://revealjs.com/initialization/
+        // - https://revealjs.com/config/
+        Reveal.initialize({
+            width: 1600,
+            height: 900,
+            margin: 0.1,
+
+            slideNumber: 'c/t',
+            controls: false,
+            hash: true,
+
+            // Learn about plugins: https://revealjs.com/plugins/
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMermaid]
+        });
+    </script>
+</body>
+
+</html>
